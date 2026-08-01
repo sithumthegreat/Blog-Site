@@ -1,17 +1,19 @@
 <?php
-require_once __DIR__ . '/config/database.php';
+// 1. Single database inclusion
+$pdo = require_once __DIR__ . '/config/database.php';
 
+// 2. Ensure session is initialized
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$pdo = require __DIR__ . '/config/database.php';
-
+// 3. Fetch posts INCLUDING bp.user_id
 $stmt = $pdo->query(
     'SELECT
         bp.id AS post_id,
+        bp.user_id,
         bp.title,
-        bp.excerpt,
+        bp.content,
         bp.created_at,
         u.username
     FROM blogPosts bp
@@ -21,7 +23,7 @@ $stmt = $pdo->query(
 
 $posts = $stmt->fetchAll();
 
-require __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/includes/header.php';
 ?>
 
 <main>
@@ -31,6 +33,13 @@ require __DIR__ . '/includes/header.php';
         <?php if (!empty($posts)): ?>
             <div class="post-grid">
                 <?php foreach ($posts as $post): ?>
+                    <?php
+                    $preview = trim(strip_tags($post['content'] ?? ''));
+
+                    if (strlen($preview) > 160) {
+                        $preview = substr($preview, 0, 157) . '...';
+                    }
+                    ?>
                     <article class="post-card">
                         <div class="post-meta">
                             <span>By <?php echo htmlspecialchars($post['username']); ?></span>
@@ -38,9 +47,17 @@ require __DIR__ . '/includes/header.php';
                         </div>
 
                         <h2><?php echo htmlspecialchars($post['title']); ?></h2>
-                        <p><?php echo htmlspecialchars($post['excerpt']); ?></p>
+                        <p><?php echo htmlspecialchars($preview); ?></p>
 
-                        <a href="/dev-blog/view.php?id=<?php echo (int) $post['post_id']; ?>">Read More</a>
+                        <div class="card-actions">
+                            <a href="view.php?id=<?php echo (int) $post['post_id']; ?>" class="btn-read">Read More</a>
+                            
+                            <!-- Check if logged-in user owns this post -->
+                            <?php if (isset($_SESSION['user_id']) && (int)$_SESSION['user_id'] === (int)$post['user_id']): ?>
+                                <a href="edit.php?id=<?php echo (int) $post['post_id']; ?>" class="btn-edit">Edit</a>
+                                <a href="delete.php?id=<?php echo (int) $post['post_id']; ?>" class="btn-delete">Delete</a>
+                            <?php endif; ?>
+                        </div>
                     </article>
                 <?php endforeach; ?>
             </div>
@@ -50,4 +67,4 @@ require __DIR__ . '/includes/header.php';
     </section>
 </main>
 
-<?php require __DIR__ . '/includes/footer.php'; ?>
+<?php require_once __DIR__ . '/includes/footer.php'; ?>

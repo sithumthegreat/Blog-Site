@@ -1,31 +1,39 @@
 <?php
-require_once __DIR__ . '/config/database.php';
+// 1. Single database inclusion
+$pdo = require_once __DIR__ . '/config/database.php';
 
+// 2. Ensure session is initialized
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$pdo = require __DIR__ . '/config/database.php';
-
 $postId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
-if (!$postId) {
-    require __DIR__ . '/includes/header.php';
+// Helper function to render a clean 404 page
+function render404() {
+    require_once __DIR__ . '/includes/header.php';
     ?>
     <main>
         <section class="feed-wrapper">
             <h1>404 - Post Not Found</h1>
             <p>The blog post you requested does not exist.</p>
+            <a href="index.php" class="btn">Return Home</a>
         </section>
     </main>
     <?php
-    require __DIR__ . '/includes/footer.php';
+    require_once __DIR__ . '/includes/footer.php';
     exit;
 }
 
+if (!$postId) {
+    render404();
+}
+
+// 3. Fetch post details INCLUDING bp.user_id
 $stmt = $pdo->prepare(
     'SELECT
         bp.id AS post_id,
+        bp.user_id,
         bp.title,
         bp.content,
         bp.created_at,
@@ -39,20 +47,10 @@ $stmt->execute([':id' => $postId]);
 $post = $stmt->fetch();
 
 if (!$post) {
-    require __DIR__ . '/includes/header.php';
-    ?>
-    <main>
-        <section class="feed-wrapper">
-            <h1>404 - Post Not Found</h1>
-            <p>The blog post you requested does not exist.</p>
-        </section>
-    </main>
-    <?php
-    require __DIR__ . '/includes/footer.php';
-    exit;
+    render404();
 }
 
-require __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/includes/header.php';
 ?>
 
 <main>
@@ -64,7 +62,16 @@ require __DIR__ . '/includes/header.php';
             </div>
 
             <h1><?php echo htmlspecialchars($post['title']); ?></h1>
+            
             <div id="post-content" class="markdown-body"></div>
+
+            <!-- Action buttons for the post owner -->
+            <?php if (isset($_SESSION['user_id']) && (int)$_SESSION['user_id'] === (int)$post['user_id']): ?>
+                <div class="post-actions" style="margin-top: 2rem; display: flex; gap: 1rem;">
+                    <a href="edit.php?id=<?php echo (int) $post['post_id']; ?>" class="btn btn-edit">Edit Post</a>
+                    <a href="delete.php?id=<?php echo (int) $post['post_id']; ?>" class="btn btn-delete">Delete Post</a>
+                </div>
+            <?php endif; ?>
         </article>
     </section>
 </main>
@@ -88,4 +95,4 @@ require __DIR__ . '/includes/header.php';
     });
 </script>
 
-<?php require __DIR__ . '/includes/footer.php'; ?>
+<?php require_once __DIR__ . '/includes/footer.php'; ?>
