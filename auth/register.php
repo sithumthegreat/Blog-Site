@@ -54,35 +54,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <main>
-    <section>
-        <h1>Register</h1>
+    <section class="auth-section">
+        <span class="auth-eyebrow">Join the blog</span>
+        <h1>Create your account</h1>
+        <p class="auth-subtitle">Pick a username, verify your email, and start writing.</p>
 
         <?php if (!empty($errors)): ?>
-            <ul>
-                <?php foreach ($errors as $error): ?>
-                    <li><?php echo htmlspecialchars($error); ?></li>
-                <?php endforeach; ?>
-            </ul>
+            <div class="form-error">
+                <ul>
+                    <?php foreach ($errors as $error): ?>
+                        <li><?php echo htmlspecialchars($error); ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
         <?php endif; ?>
 
-        <form method="POST" action="register.php">
+        <form method="POST" action="register.php" class="auth-card">
             <div>
                 <label for="username">Username</label>
-                <input type="text" id="username" name="username" required>
+                <input type="text" id="username" name="username" placeholder="jdoe" required autofocus>
             </div>
 
             <div>
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" required>
+                <input type="email" id="email" name="email" placeholder="you@example.com" required>
             </div>
 
             <div>
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" id="password" name="password" placeholder="••••••••" required>
             </div>
 
-            <button type="submit">Register</button>
+            <button type="submit">Create account</button>
         </form>
+
+        <p class="auth-footer">
+            Already have an account? <a href="login.php">Log in</a>
+        </p>
     </section>
 </main>
 

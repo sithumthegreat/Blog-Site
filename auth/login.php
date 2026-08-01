@@ -30,26 +30,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <main>
-    <section>
-        <h1>Login</h1>
+    <section class="auth-section">
+        <span class="auth-eyebrow">Member access</span>
+        <h1>Welcome back</h1>
+        <p class="auth-subtitle">Sign in to keep reading and writing.</p>
 
         <?php if ($error !== ''): ?>
-            <p><?php echo htmlspecialchars($error); ?></p>
+            <p class="form-error"><?php echo htmlspecialchars($error); ?></p>
         <?php endif; ?>
 
-        <form method="POST" action="login.php">
+        <form method="POST" action="login.php" class="auth-card">
             <div>
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" required>
+                <input type="email" id="email" name="email" placeholder="you@example.com" required autofocus>
             </div>
 
             <div>
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" id="password" name="password" placeholder="••••••••" required>
             </div>
 
-            <button type="submit">Login</button>
+            <button type="submit">Log in</button>
         </form>
+
+        <p class="auth-footer">
+            New here? <a href="register.php">Create an account</a>
+        </p>
     </section>
 </main>
 
