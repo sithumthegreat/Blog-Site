@@ -1,0 +1,9 @@
+# Sensitive credentials
+config/database.php
+
+# System & OS junk files
+.DS_Store
+Thumbs.db
+
+# VS Code settings
+.vscode/
