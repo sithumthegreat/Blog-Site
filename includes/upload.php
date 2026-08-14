@@ -11,7 +11,6 @@ function uploadCoverImage(array $file): ?string {
         return null;
     }
 
-    // Check MIME type using built-in mime_content_type
     $mimeType = mime_content_type($file['tmp_name']);
 
     if (!in_array($mimeType, $allowedTypes, true)) {
@@ -24,8 +23,7 @@ function uploadCoverImage(array $file): ?string {
         mkdir($uploadDir, 0755, true);
     }
 
-    // Resized images are always saved as .jpg to keep things simple and
-    // keep file sizes small and predictable, regardless of the source format.
+
     $filename = bin2hex(random_bytes(16)) . '.jpg';
     $destination = $uploadDir . $filename;
 
@@ -38,11 +36,7 @@ function uploadCoverImage(array $file): ?string {
     return 'uploads/' . $filename;
 }
 
-/**
- * Resizes an uploaded image down to a max width/height (keeping aspect
- * ratio) and saves it as a compressed JPEG. This makes the actual file
- * on disk small — not just visually cropped by CSS.
- */
+
 function resizeAndSaveCoverImage(string $sourcePath, string $mimeType, string $destination): bool {
     $maxWidth = 1200;
     $maxHeight = 800;
@@ -81,8 +75,7 @@ function resizeAndSaveCoverImage(string $sourcePath, string $mimeType, string $d
 
     $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
 
-    // Flatten transparency (PNG/GIF/WEBP) onto a white background,
-    // since we're always saving as JPEG which has no alpha channel.
+  
     $white = imagecolorallocate($resizedImage, 255, 255, 255);
     imagefill($resizedImage, 0, 0, $white);
 

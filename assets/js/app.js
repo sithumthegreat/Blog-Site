@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-    /* ---------------- Flash messages (existing, unchanged) ---------------- */
 
     const flashMessages = document.querySelectorAll('.alert, .flash-message');
 
@@ -13,7 +12,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 4000);
     });
 
-    /* ---------------- Auth form validation (existing, unchanged) ---------------- */
 
     const authForms = document.querySelectorAll('form[action*="login.php"], form[action*="register.php"]');
 
@@ -61,9 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    /* ---------------- Delete confirmation (upgraded to a themed modal) ---------------- */
-    /* Falls back to window.confirm automatically if the modal markup
-       fails to build for any reason, so delete protection never breaks. */
+  
 
     const deleteActions = document.querySelectorAll('.btn-delete, form[action*="delete.php"]');
 
@@ -122,7 +118,6 @@ document.addEventListener('DOMContentLoaded', function () {
         document.body.appendChild(overlay);
         document.body.classList.add('modal-open');
 
-        // Trigger the entrance transition on the next frame.
         requestAnimationFrame(function () {
             overlay.classList.add('is-visible');
         });
@@ -162,7 +157,6 @@ document.addEventListener('DOMContentLoaded', function () {
         confirmBtn.focus();
     }
 
-    /* ---------------- Markdown live preview (existing, unchanged) ---------------- */
 
     const markdownTextarea = document.getElementById('content');
     const markdownPreview = document.getElementById('preview');
@@ -176,7 +170,6 @@ document.addEventListener('DOMContentLoaded', function () {
         updatePreview();
     }
 
-    /* ---------------- Post card staggered reveal on scroll ---------------- */
 
     const revealCards = document.querySelectorAll('.post-card');
 
@@ -204,7 +197,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    /* ---------------- Reading progress bar (post detail view only) ---------------- */
 
     const postDetail = document.querySelector('.post-detail');
 
@@ -232,13 +224,11 @@ document.addEventListener('DOMContentLoaded', function () {
         updateProgress();
     }
 
-    /* ---------------- Estimated reading time badge (post detail view only) ---------------- */
 
     const postContent = document.getElementById('post-content');
     const postMeta = document.querySelector('.post-detail .post-meta');
 
     if (postContent && postMeta) {
-        // Give marked.js a moment to finish rendering the markdown first.
         setTimeout(function () {
             const wordCount = postContent.textContent.trim().split(/\s+/).filter(Boolean).length;
             const minutes = Math.max(1, Math.round(wordCount / 200));

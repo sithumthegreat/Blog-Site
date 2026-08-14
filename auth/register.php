@@ -4,7 +4,6 @@ require_once __DIR__ . '/../includes/header.php';
 
 $errors = [];
 $success = '';
-//success is for sussess messages and errors is for if user tyoes something wrong
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
     $email = trim($_POST['email'] ?? '');

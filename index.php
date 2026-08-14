@@ -1,5 +1,5 @@
 <?php
-// 1. Single database inclusion
+
 $pdo = require_once __DIR__ . '/config/database.php';
 
 // 2. Ensure session is initialized
@@ -7,7 +7,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// 3. Fetch posts INCLUDING bp.cover_image
+
 $stmt = $pdo->query(
     'SELECT
         bp.id AS post_id,
