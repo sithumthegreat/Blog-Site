@@ -28,7 +28,7 @@
     --font-body: 'Source Serif 4', Georgia, 'Times New Roman', serif;
     --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
 
-    /* Legacy variable names kept so nothing else needs to change */
+    /* Legacy variable names */
     --bg: var(--paper);
     --text: var(--ink);
     --muted: var(--ink-soft);
@@ -49,7 +49,6 @@ body {
     color: var(--ink);
     line-height: 1.65;
     background-color: var(--paper);
-    /* faint ruled-page texture — quiet, not decorative for its own sake */
     background-image: repeating-linear-gradient(
         180deg,
         rgba(30, 42, 34, 0.028) 0px,
@@ -148,8 +147,6 @@ p {
     color: var(--ink);
 }
 
-/* An "eyebrow" rule above the page title, borrowed from a library
-   catalog header — only appears where h1 opens the page. */
 main > h1:first-child {
     position: relative;
     padding-top: 22px;
@@ -171,6 +168,7 @@ main > h1:first-child::before {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
     gap: 22px;
+    align-items: start; /* Prevents cards from forcibly stretching each other */
 }
 
 .post-card {
@@ -188,9 +186,6 @@ main > h1:first-child::before {
     transition: transform 0.18s ease, box-shadow 0.18s ease, border-left-color 0.18s ease;
 }
 
-/* Signature move: a folded card-catalog corner, stamped in the
-   sienna accent, that tucks in further on hover — like drawing
-   a card slightly out of the drawer. */
 .post-card::after {
     content: "";
     position: absolute;
@@ -230,9 +225,8 @@ main > h1:first-child::before {
     letter-spacing: 0.04em;
     color: var(--ink-soft);
     text-transform: uppercase;
-    padding-top: 2px;
     border-top: 1px dashed var(--rule);
-    margin-top: 2px;
+    margin-top: auto; /* Pushes meta and action buttons to bottom */
     padding-top: 10px;
 }
 
@@ -242,29 +236,75 @@ form button {
     text-decoration: none;
 }
 
-.post-card > a {
-    color: var(--accent-deep);
-    font-family: var(--font-mono);
-    font-weight: 600;
-    font-size: 0.85rem;
-    letter-spacing: 0.02em;
-    display: inline-flex;
+.card-actions {
+    display: flex;
+    gap: 12px;
     align-items: center;
-    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 4px;
 }
 
-.post-card > a::after {
-    content: "→";
-    transition: transform 0.15s ease;
+.btn-read,
+.btn-edit,
+.btn-delete {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
 
-.post-card > a:hover,
-.post-card > a:focus {
+.btn-read {
+    color: var(--accent-deep);
+}
+
+.btn-read:hover {
     color: var(--stamp);
 }
 
-.post-card > a:hover::after {
-    transform: translateX(3px);
+.btn-edit {
+    color: var(--ink-soft);
+}
+
+.btn-delete {
+    color: var(--stamp);
+}
+
+/* ---------------- Cover Image Styling ---------------- */
+/* Background-image approach: the image can never affect this element's
+   box size, no matter its original dimensions, aspect ratio, or whether
+   it fails to load. This replaces the old <img> + object-fit rules,
+   which is the more fragile approach. */
+
+.post-cover {
+    width: 100%;
+    height: 200px;
+    flex-shrink: 0; /* Prevents wrapper from changing height */
+    border-radius: var(--radius);
+    background-color: var(--surface-tint);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: transform 0.5s ease;
+}
+
+.post-card:hover .post-cover {
+    transform: scale(1.03);
+}
+
+.post-cover--empty {
+    background-image: linear-gradient(135deg, var(--surface-tint), var(--accent-soft));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.post-cover--empty::after {
+    content: "✎";
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    color: var(--accent);
+    opacity: 0.5;
 }
 
 /* ---------------- Forms ---------------- */
@@ -294,8 +334,9 @@ label {
     color: var(--ink-soft);
 }
 
-/* Typewriter-style fields: underline only, no boxed borders */
-input,
+input[type="text"],
+input[type="password"],
+input[type="email"],
 textarea {
     width: 100%;
     border: none;
@@ -308,6 +349,13 @@ textarea {
     background: transparent;
     color: var(--ink);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input[type="file"] {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    padding: 6px 0;
 }
 
 input::placeholder,
@@ -366,6 +414,11 @@ button:active,
 .post-detail {
     max-width: 700px;
     margin: 0 auto;
+}
+
+.post-detail .post-cover {
+    height: 380px; /* Taller banner view for reading mode */
+    margin-bottom: 24px;
 }
 
 .post-detail .post-meta {
@@ -427,8 +480,6 @@ button:active,
     font-style: italic;
 }
 
-/* Drop cap on the opening paragraph of a post — the one
-   flourish reserved for the reading view. */
 .markdown-body > p:first-of-type::first-letter {
     font-family: var(--font-display);
     font-weight: 700;
@@ -439,29 +490,7 @@ button:active,
     color: var(--stamp);
 }
 
-/* ---------------- Responsive ---------------- */
-
-@media (max-width: 640px) {
-    nav ul {
-        justify-content: center;
-        padding: 14px 16px;
-    }
-
-    main {
-        padding: 32px 14px 44px;
-    }
-
-    form,
-    .post-card {
-        padding: 18px;
-    }
-
-    .markdown-body > p:first-of-type::first-letter {
-        font-size: 2.6em;
-    }
-}
-
-/* ---------------- Auth pages (login / register) ---------------- */
+/* ---------------- Auth pages ---------------- */
 
 .auth-section {
     max-width: 420px;
@@ -516,7 +545,6 @@ button:active,
     padding: 12px 14px;
     margin: 0 0 20px;
     font-size: 0.92rem;
-    color: var(--accent-deep, #7a3419);
     color: #7a3419;
 }
 
@@ -561,7 +589,165 @@ button:active,
     color: var(--stamp);
 }
 
-/* ---------------- Accessibility ---------------- */
+/* ---------------- Luxury scroll reveal ---------------- */
+
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+}
+
+.reveal-on-scroll.is-revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ---------------- Luxury delete confirmation modal ---------------- */
+
+.confirm-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(30, 42, 34, 0.45);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    padding: 20px;
+}
+
+.confirm-overlay.is-visible {
+    opacity: 1;
+}
+
+.confirm-modal {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border-top: 4px solid var(--stamp);
+    box-shadow: 0 24px 60px rgba(30, 42, 34, 0.3);
+    max-width: 400px;
+    width: 100%;
+    padding: 28px;
+    transform: translateY(10px) scale(0.98);
+    transition: transform 0.2s ease;
+}
+
+.confirm-overlay.is-visible .confirm-modal {
+    transform: translateY(0) scale(1);
+}
+
+.confirm-modal h2 {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+}
+
+.confirm-modal p {
+    color: var(--ink-soft);
+    margin-bottom: 22px;
+}
+
+.confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.confirm-cancel,
+.confirm-delete {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 11px 20px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.confirm-cancel {
+    background: var(--surface-tint);
+    color: var(--ink-soft);
+}
+
+.confirm-cancel:hover {
+    background: var(--rule);
+}
+
+.confirm-delete {
+    background: var(--stamp);
+    color: #fff;
+}
+
+.confirm-delete:hover {
+    background: #96401f;
+    transform: translateY(-1px);
+}
+
+body.modal-open {
+    overflow: hidden;
+}
+
+/* ---------------- Luxury reading progress bar ---------------- */
+
+.reading-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: transparent;
+    z-index: 20;
+}
+
+.reading-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--stamp);
+    transition: width 0.1s linear;
+}
+
+/* ---------------- Luxury reading time badge ---------------- */
+
+.reading-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.reading-time::before {
+    content: "·";
+    margin-right: 4px;
+    color: var(--rule);
+}
+
+/* ---------------- Responsive & Accessibility ---------------- */
+
+@media (max-width: 640px) {
+    nav ul {
+        justify-content: center;
+        padding: 14px 16px;
+    }
+
+    main {
+        padding: 32px 14px 44px;
+    }
+
+    form,
+    .post-card {
+        padding: 18px;
+    }
+
+    .markdown-body > p:first-of-type::first-letter {
+        font-size: 2.6em;
+    }
+
+    .post-cover {
+        height: 160px;
+    }
+}
 
 a:focus-visible,
 button:focus-visible,
@@ -574,5 +760,14 @@ textarea:focus-visible {
 @media (prefers-reduced-motion: reduce) {
     * {
         transition: none !important;
+    }
+
+    .reveal-on-scroll {
+        opacity: 1;
+        transform: none;
+    }
+
+    .post-card:hover .post-cover {
+        transform: none;
     }
 }

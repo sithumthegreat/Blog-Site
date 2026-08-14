@@ -1,15 +1,12 @@
 <?php
-// 1. Single database inclusion
 $pdo = require_once __DIR__ . '/config/database.php';
 
-// 2. Ensure session is initialized
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 $postId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
-// Helper function to render a clean 404 page
 function render404() {
     require_once __DIR__ . '/includes/header.php';
     ?>
@@ -29,16 +26,16 @@ if (!$postId) {
     render404();
 }
 
-// 3. Fetch post details INCLUDING bp.user_id
 $stmt = $pdo->prepare(
     'SELECT
         bp.id AS post_id,
         bp.user_id,
         bp.title,
+        bp.cover_image,
         bp.content,
         bp.created_at,
         u.username
-    FROM blogPosts bp
+    FROM blogposts bp
     INNER JOIN users u ON bp.user_id = u.id
     WHERE bp.id = :id
     LIMIT 1'
@@ -56,6 +53,12 @@ require_once __DIR__ . '/includes/header.php';
 <main>
     <section class="feed-wrapper">
         <article class="post-card post-detail">
+            <?php if (!empty($post['cover_image'])): ?>
+                <div class="post-cover-image" style="margin-bottom: 1.5rem;">
+                    <img src="<?php echo htmlspecialchars($post['cover_image']); ?>" alt="Cover Image" style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px;">
+                </div>
+            <?php endif; ?>
+
             <div class="post-meta">
                 <span>By <?php echo htmlspecialchars($post['username']); ?></span>
                 <span><?php echo htmlspecialchars(date('M d, Y', strtotime($post['created_at']))); ?></span>
@@ -65,7 +68,6 @@ require_once __DIR__ . '/includes/header.php';
             
             <div id="post-content" class="markdown-body"></div>
 
-            <!-- Action buttons for the post owner -->
             <?php if (isset($_SESSION['user_id']) && (int)$_SESSION['user_id'] === (int)$post['user_id']): ?>
                 <div class="post-actions" style="margin-top: 2rem; display: flex; gap: 1rem;">
                     <a href="edit.php?id=<?php echo (int) $post['post_id']; ?>" class="btn btn-edit">Edit Post</a>
@@ -83,9 +85,7 @@ require_once __DIR__ . '/includes/header.php';
     document.addEventListener('DOMContentLoaded', function () {
         const container = document.getElementById('post-content');
 
-        if (!container) {
-            return;
-        }
+        if (!container) return;
 
         if (typeof marked !== 'undefined') {
             container.innerHTML = marked.parse(markdownContent);

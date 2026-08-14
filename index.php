@@ -7,13 +7,14 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// 3. Fetch posts INCLUDING bp.user_id
+// 3. Fetch posts INCLUDING bp.cover_image
 $stmt = $pdo->query(
     'SELECT
         bp.id AS post_id,
         bp.user_id,
         bp.title,
         bp.content,
+        bp.cover_image,
         bp.created_at,
         u.username
     FROM blogPosts bp
@@ -41,6 +42,12 @@ require_once __DIR__ . '/includes/header.php';
                     }
                     ?>
                     <article class="post-card">
+                        <?php if (!empty($post['cover_image'])): ?>
+                            <div class="post-cover-image" style="width: 100%; height: 180px; overflow: hidden; border-radius: 8px;">
+                                <img src="<?php echo htmlspecialchars($post['cover_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                        <?php endif; ?>
+
                         <div class="post-meta">
                             <span>By <?php echo htmlspecialchars($post['username']); ?></span>
                             <span><?php echo htmlspecialchars(date('M d, Y', strtotime($post['created_at']))); ?></span>
